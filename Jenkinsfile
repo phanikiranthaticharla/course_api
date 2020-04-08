@@ -9,12 +9,12 @@ pipeline {
               	sh 'mvn clean compile'
             }
         }
-        stage('Run SpringBoot') {
+        stage('Start SpringBoot Application') {
 	        steps {
                	sh 'mvn spring-boot:run &'
             }
         }
-        stage('Testing Stage') {
+        stage('Run UnitTests') {
             steps {
               	sh 'mvn test'
             }
