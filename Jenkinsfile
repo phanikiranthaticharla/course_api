@@ -9,15 +9,15 @@ pipeline {
               	sh 'mvn clean compile'
             }
         }
-        stage('Testing Stage') {
-            steps {
-              	sh 'mvn test'
-            }
-        }
         stage('Run SpringBoot') {
 	        steps {
                	sh 'mvn spring-boot:run &'
             }
         }
-    }
+        stage('Testing Stage') {
+            steps {
+              	sh 'mvn test'
+            }
+        }
+    }	
 }
