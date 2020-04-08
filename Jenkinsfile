@@ -1,12 +1,9 @@
 pipeline {
     agent any
-
+	tools {
+        maven 'maven_3.6.3' 
+    }
     stages {
-
-        tools {
-            maven 'maven_3.6.3' 
-        }
-
         stage('Compile Stage') {
             steps {
               	sh 'mvn clean compile'
