@@ -9,6 +9,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -26,69 +33,78 @@ class CourseApiApplicationTests {
 
 	// JUnit Test for verifying GET Request
 	@Test
-	void verifyGETRequest() {
-        
-		
-		try {
-			URL url = new URL("http://localhost:9090/topics"); 
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("GET");
-			int responseCode = connection.getResponseCode();
+	void verifyGetTopics() throws ClientProtocolException, IOException {
+		// Given
+	    HttpUriRequest request = new HttpGet( "http://localhost:9090/topics");
+	 
+	    // When
+	    HttpResponse httpResponse = HttpClientBuilder.create().build().execute( request );
+	 
+	    // Then
+	    assertEquals(
+	      httpResponse.getStatusLine().getStatusCode(),
+	      (HttpStatus.SC_OK));
 
-			int expectedCode = 200; 
-			assertEquals(expectedCode, responseCode);
-			
-			BufferedReader in = new BufferedReader(
-					new InputStreamReader(connection.getInputStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			System.out.println("response "+response.toString());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
-		
-		
 	}
 	
 	@Test
-	void verifyGETSingleTopic() {
+	public void testInvalidTopicStatusCode()
+	  throws ClientProtocolException, IOException {
+	  
+	    // Given
+	    HttpUriRequest request = new HttpGet( "http://localhost:9090/inValidTopic");
+	 
+	    // When
+	    HttpResponse httpResponse = HttpClientBuilder.create().build().execute( request );
+	 
+	    // Then
+	    assertEquals(
+	      httpResponse.getStatusLine().getStatusCode(),
+	      (HttpStatus.SC_NOT_FOUND));
+
+	}
+	    
+	@Test
+	public void
+	givenRequestWithNoAcceptHeader_whenRequestIsExecuted_thenDefaultResponseContentTypeIsJson()
+	  throws ClientProtocolException, IOException {
+	  
+	   // Given
+	   String jsonMimeType = "application/json";
+	   HttpUriRequest request = new HttpGet( "http://localhost:9090/topics/Hadoop" );
+	 
+	   // When
+	   HttpResponse response = HttpClientBuilder.create().build().execute( request );
+	 
+	   // Then
+	   String mimeType = ContentType.getOrDefault(response.getEntity()).getMimeType();
+	   assertEquals( jsonMimeType, mimeType );
+	}
+	
+	@Test
+	void verifyHadoopTopicJsonPayload() throws ClientProtocolException, IOException, JSONException {
         
 		
-		try {
-			URL url = new URL("http://localhost:9090/topics/Hadoop"); 
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("GET");
-			int responseCode = connection.getResponseCode();
+	
+		// Given
+		HttpUriRequest request = new HttpGet( "http://localhost:9090/topics");
 
-			int expectedCode = 200; 
-			assertEquals(expectedCode, responseCode);
-			
-			BufferedReader in = new BufferedReader(
-					new InputStreamReader(connection.getInputStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			System.out.println("response "+response.toString());
-			JSONObject jsonObj = new JSONObject(); 
-       		
-		    jsonObj.put("name", "Hadoop EcoSystem");
-		    jsonObj.put("description", "Hadoop Description");
-		    jsonObj.put("id", "Hadoop");
-		    
-		    assertEquals(jsonObj.toString(), response.toString());
+		// When
+		HttpResponse httpResponse = HttpClientBuilder.create().build().execute( request );
 
-			
-		} catch (IOException e) {
-			System.out.println("IO Exception Caught ");
-		} catch (JSONException e) {
-			System.out.println("JSONException Caught");
-		}	
-		
+		// Then
+		assertEquals(
+				httpResponse.getStatusLine().getStatusCode(),
+				(HttpStatus.SC_OK));
+		JSONObject jsonObj = new JSONObject(); 
+
+		jsonObj.put("name", "Hadoop EcoSystem");
+		jsonObj.put("description", "Hadoop Description");
+		jsonObj.put("id", "Hadoop");
+
+		assertEquals(jsonObj.toString(), httpResponse.toString());
+	
+
 		
 	}
 	

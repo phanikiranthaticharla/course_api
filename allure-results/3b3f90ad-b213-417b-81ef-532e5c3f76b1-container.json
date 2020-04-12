@@ -1,0 +1,1 @@
+{"uuid":"3b3f90ad-b213-417b-81ef-532e5c3f76b1","name":"givenRequestWithNoAcceptHeader_whenRequestIsExecuted_thenDefaultResponseContentTypeIsJson()","children":["87fb4369-8ca2-4d29-9241-be6059bff945"],"befores":[],"afters":[],"links":[],"start":1586701102068,"stop":1586701102340}
